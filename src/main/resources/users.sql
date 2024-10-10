@@ -6,3 +6,6 @@ CREATE TABLE `users`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 commit;
+
+select * from users;
+select * from cars;

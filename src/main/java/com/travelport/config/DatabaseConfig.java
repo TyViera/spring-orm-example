@@ -7,9 +7,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.transaction.TransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
+@EnableTransactionManagement
 @PropertySource("classpath:application.properties")
 public class DatabaseConfig {
 
@@ -40,9 +44,7 @@ public class DatabaseConfig {
     var sessionFactory = new LocalSessionFactoryBean();
     sessionFactory.setDataSource(dataSource());
     sessionFactory.setPackagesToScan("com.travelport.entities");
-    var prop = new Properties();
-    prop.put("hibernate.show_sql", "true");
-    sessionFactory.setHibernateProperties(prop);
+    sessionFactory.setHibernateProperties(hibernateProperties());
 
     // xml mapping - in the past xml files were used to map entities
     // sessionFactory.setMappingResources("com/travelport/entities/User.hbm.xml");
@@ -50,6 +52,19 @@ public class DatabaseConfig {
     // annotated mapping - in case you want to add more entities
     //sessionFactory.setAnnotatedClasses(User.class);
     return sessionFactory;
+  }
+
+  @Bean
+  public TransactionManager transactionManager() {
+    var transactionManager = new HibernateTransactionManager();
+    transactionManager.setSessionFactory(hibernateSessionFactory().getObject());
+    return transactionManager;
+  }
+
+  private Properties hibernateProperties() {
+    var prop = new Properties();
+    prop.put("hibernate.show_sql", "true");
+    return prop;
   }
 
 }

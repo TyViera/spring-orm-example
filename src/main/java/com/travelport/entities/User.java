@@ -1,10 +1,15 @@
 package com.travelport.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -17,6 +22,10 @@ public class User {
 
   private String name;
   private String country;
+
+  @JsonManagedReference
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  private List<Car> cars;
 
   public Integer getId() {
     return id;
@@ -40,6 +49,14 @@ public class User {
 
   public void setCountry(String country) {
     this.country = country;
+  }
+
+  public List<Car> getCars() {
+    return cars;
+  }
+
+  public void setCars(List<Car> cars) {
+    this.cars = cars;
   }
 
   @Override

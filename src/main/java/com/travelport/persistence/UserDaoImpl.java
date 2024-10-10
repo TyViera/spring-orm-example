@@ -2,42 +2,41 @@ package com.travelport.persistence;
 
 import com.travelport.entities.User;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class UserDaoImpl implements UserDao {
 
   private EntityManager entityManager;
-  private SessionFactory sessionFactory;
-  private EntityManagerFactory entityManagerFactory;
 
+  /**
+   * BEGIN
+   * -- 2 records
+   * INSERT INTO users (name, country) VALUES ('Naz', 'Peru');
+   * -- 3 records
+   * SELECT * FROM users; -- 3
+   * commit
+   * <p>
+   * SELECT * FROM users; -- 3
+   */
   @Override
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public void save(User user) {
-    /*var transaction = entityManager.getTransaction();
-    transaction.begin();
+    if (user.getCars() != null && !user.getCars().isEmpty()) {
+      user.getCars().forEach(x -> x.setUser(user));
+    }
     entityManager.persist(user);
-    transaction.commit();*/
-
-    //var sf = entityManagerFactory.unwrap(SessionFactory.class);
-
-    Session session = sessionFactory.openSession();
-    Transaction tx = session.beginTransaction();
-    session.persist(user);
-    tx.commit();
-    session.close();
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<User> list() {
     //JPQL
-    return sessionFactory.openSession().createQuery("from User", User.class).getResultList();
+    return entityManager.createQuery("from User", User.class).getResultList();
   }
 
   //Setters dependency injection
@@ -45,15 +44,5 @@ public class UserDaoImpl implements UserDao {
   @PersistenceContext
   public void setEntityManager(EntityManager entityManager) {
     this.entityManager = entityManager;
-  }
-
-  @Autowired
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  @Autowired
-  public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
-    this.entityManagerFactory = entityManagerFactory;
   }
 }
