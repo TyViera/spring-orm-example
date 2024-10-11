@@ -3,9 +3,12 @@ package com.travelport.persistence;
 import com.travelport.entities.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
@@ -24,7 +27,7 @@ public class UserDaoImpl implements UserDao {
    * SELECT * FROM users; -- 3
    */
   @Override
-  @Transactional(isolation = Isolation.READ_COMMITTED)
+  @Transactional(isolation = Isolation.READ_COMMITTED, transactionManager = "")
   public void save(User user) {
     if (user.getCars() != null && !user.getCars().isEmpty()) {
       user.getCars().forEach(x -> x.setUser(user));
@@ -33,10 +36,33 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public List<User> list() {
+  @Transactional(readOnly = true, propagation = Propagation.NEVER)
+  public List<User> list(String name, String carName) {
     //JPQL
-    return entityManager.createQuery("from User", User.class).getResultList();
+    //select * from users where name like ?
+    String jpql;
+    var receiveName = name != null && !name.isEmpty();
+    var receiveCarBrand = carName != null && !carName.isEmpty();
+    if (receiveName && receiveCarBrand) {
+      jpql = "from User u join u.cars c WHERE u.name like :name AND c.brand like :carName";
+    } else if (receiveName) {
+      jpql = "from User u WHERE u.name like :name";
+    } else if (receiveCarBrand) {
+      jpql = "from User u join u.cars c WHERE c.brand like :carName";
+    } else {
+      jpql = "from User";
+    }
+
+    var query = entityManager.createQuery(jpql, User.class);
+    if (receiveName) {
+      query.setParameter("name", name);
+    }
+
+    if (receiveCarBrand) {
+      query.setParameter("carName", carName);
+    }
+
+    return query.getResultList();
   }
 
   //Setters dependency injection

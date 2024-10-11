@@ -25,6 +25,7 @@ public class User {
 
   @JsonManagedReference
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  // select c.*, u.* from users u join cars c on users.id = cars.user_id ;
   private List<Car> cars;
 
   public Integer getId() {
