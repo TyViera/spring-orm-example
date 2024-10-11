@@ -1,11 +1,11 @@
-package com.travelport.persistence;
+package com.travelport.persistence.impl;
 
 import com.travelport.entities.User;
+import com.travelport.persistence.UserDao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -27,7 +27,7 @@ public class UserDaoImpl implements UserDao {
    * SELECT * FROM users; -- 3
    */
   @Override
-  @Transactional(isolation = Isolation.READ_COMMITTED, transactionManager = "")
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public void save(User user) {
     if (user.getCars() != null && !user.getCars().isEmpty()) {
       user.getCars().forEach(x -> x.setUser(user));
@@ -65,8 +65,18 @@ public class UserDaoImpl implements UserDao {
     return query.getResultList();
   }
 
-  //Setters dependency injection
+  @Override
+  public Optional<User> getUserById(Integer id) {
+    return Optional.ofNullable(entityManager.find(User.class, id));
+  }
 
+  @Override
+  @Transactional(isolation = Isolation.READ_COMMITTED)
+  public void update(User user) {
+    entityManager.merge(user);
+  }
+
+  //Setters dependency injection
   @PersistenceContext
   public void setEntityManager(EntityManager entityManager) {
     this.entityManager = entityManager;

@@ -28,6 +28,11 @@ public class User {
   // select c.*, u.* from users u join cars c on users.id = cars.user_id ;
   private List<Car> cars;
 
+  @JsonManagedReference
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  // select c.*, u.* from users u join cars c on users.id = cars.user_id ;
+  private List<Role> roles;
+
   public Integer getId() {
     return id;
   }

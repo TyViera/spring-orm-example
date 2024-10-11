@@ -12,14 +12,14 @@ import jakarta.persistence.Table;
 import java.util.Objects;
 
 @Entity
-@Table(name = "cars")
-public class Car {
+@Table(name = "roles")
+public class Role {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  private String brand;
+  private String name;
 
   @JsonBackReference
   @ManyToOne(fetch = FetchType.EAGER)
@@ -34,14 +34,13 @@ public class Car {
     this.id = id;
   }
 
-  public String getBrand() {
-    return brand;
+  public String getName() {
+    return name;
   }
 
-  public void setBrand(String brand) {
-    this.brand = brand;
+  public void setName(String name) {
+    this.name = name;
   }
-
 
   public User getUser() {
     return user;
@@ -54,7 +53,7 @@ public class Car {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof Car car)) return false;
+    if (!(o instanceof Role car)) return false;
     return Objects.equals(id, car.id);
   }
 
