@@ -12,8 +12,9 @@ public abstract class AbstractEntityDaoImpl<E> implements AbstractEntityDao<E> {
 
   @PersistenceContext
   private EntityManager entityManager;
-  private Class<E> persistentClass;
+  private final Class<E> persistentClass;
 
+  @SuppressWarnings("unchecked")
   protected AbstractEntityDaoImpl() {
     this.persistentClass = (Class<E>) ((ParameterizedType) getClass()
         .getGenericSuperclass()).getActualTypeArguments()[0];
@@ -26,6 +27,8 @@ public abstract class AbstractEntityDaoImpl<E> implements AbstractEntityDao<E> {
 
   @Override
   public List<E> list() {
-    return entityManager.createNamedQuery("from " + persistentClass.getName(), persistentClass).getResultList();
+    var criteriaBuilder = entityManager.getCriteriaBuilder();
+    var query = criteriaBuilder.createQuery(persistentClass);
+    return entityManager.createQuery(query).getResultList();
   }
 }

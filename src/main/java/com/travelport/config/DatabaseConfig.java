@@ -1,7 +1,7 @@
 package com.travelport.config;
 
-import javax.sql.DataSource;
 import java.util.Properties;
+import javax.sql.DataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -40,7 +40,7 @@ public class DatabaseConfig {
   }
 
   @Bean
-  public LocalSessionFactoryBean hibernateSessionFactory() {
+  public LocalSessionFactoryBean entityManagerFactory() {
     var sessionFactory = new LocalSessionFactoryBean();
     sessionFactory.setDataSource(dataSource());
     sessionFactory.setPackagesToScan("com.travelport.entities");
@@ -57,7 +57,7 @@ public class DatabaseConfig {
   @Bean
   public TransactionManager transactionManager() {
     var transactionManager = new HibernateTransactionManager();
-    transactionManager.setSessionFactory(hibernateSessionFactory().getObject());
+    transactionManager.setSessionFactory(entityManagerFactory().getObject());
     return transactionManager;
   }
 

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class UserDaoImpl implements UserDao {
 
+  @PersistenceContext // JPA
   private EntityManager entityManager;
 
   /**
@@ -101,11 +102,5 @@ public class UserDaoImpl implements UserDao {
               entityManager.remove(user);
               return id;
             });
-  }
-
-  // Setters dependency injection
-  @PersistenceContext
-  public void setEntityManager(EntityManager entityManager) {
-    this.entityManager = entityManager;
   }
 }
