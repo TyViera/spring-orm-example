@@ -12,4 +12,6 @@ public interface UserDao {
   Optional<User> getUserById(Integer id);
 
   void update(User user);
+
+  Optional<Integer> deleteById(Integer id);
 }

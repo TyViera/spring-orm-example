@@ -4,6 +4,9 @@ import com.travelport.entities.User;
 import com.travelport.persistence.UserDao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
@@ -17,14 +20,10 @@ public class UserDaoImpl implements UserDao {
   private EntityManager entityManager;
 
   /**
-   * BEGIN
-   * -- 2 records
-   * INSERT INTO users (name, country) VALUES ('Naz', 'Peru');
-   * -- 3 records
-   * SELECT * FROM users; -- 3
-   * commit
-   * <p>
-   * SELECT * FROM users; -- 3
+   * BEGIN -- 2 records INSERT INTO users (name, country) VALUES ('Jil', 'Peru'); -- 3 records
+   * SELECT * FROM users; -- 3 commit
+   *
+   * <p>SELECT * FROM users; -- 3
    */
   @Override
   @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -38,8 +37,12 @@ public class UserDaoImpl implements UserDao {
   @Override
   @Transactional(readOnly = true, propagation = Propagation.NEVER)
   public List<User> list(String name, String carName) {
-    //JPQL
-    //select * from users where name like ?
+    return queryUsingJpql(name, carName);
+  }
+
+  private List<User> queryUsingJpql(String name, String carName) {
+    // JPQL
+    // select * from users where name like ?
     String jpql;
     var receiveName = name != null && !name.isEmpty();
     var receiveCarBrand = carName != null && !carName.isEmpty();
@@ -50,7 +53,7 @@ public class UserDaoImpl implements UserDao {
     } else if (receiveCarBrand) {
       jpql = "from User u join u.cars c WHERE c.brand like :carName";
     } else {
-      jpql = "from User";
+      jpql = "from User u";
     }
 
     var query = entityManager.createQuery(jpql, User.class);
@@ -65,6 +68,19 @@ public class UserDaoImpl implements UserDao {
     return query.getResultList();
   }
 
+  private List<User> queryUsingCriteria(String name, String carName) {
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<User> query = cb.createQuery(User.class);
+    Root<User> root = query.from(User.class);
+    if (name != null && !name.isEmpty()) {
+      query.where(cb.like(root.get("name"), name));
+    }
+    if (carName != null && !carName.isEmpty()) {
+      query.where(cb.like(root.get("cars").get("brand"), carName));
+    }
+    return entityManager.createQuery(query).getResultList();
+  }
+
   @Override
   public Optional<User> getUserById(Integer id) {
     return Optional.ofNullable(entityManager.find(User.class, id));
@@ -76,7 +92,18 @@ public class UserDaoImpl implements UserDao {
     entityManager.merge(user);
   }
 
-  //Setters dependency injection
+  @Override
+  @Transactional(isolation = Isolation.READ_COMMITTED)
+  public Optional<Integer> deleteById(Integer id) {
+    return getUserById(id)
+        .map(
+            user -> {
+              entityManager.remove(user);
+              return id;
+            });
+  }
+
+  // Setters dependency injection
   @PersistenceContext
   public void setEntityManager(EntityManager entityManager) {
     this.entityManager = entityManager;

@@ -64,6 +64,7 @@ public class DatabaseConfig {
   private Properties hibernateProperties() {
     var prop = new Properties();
     prop.put("hibernate.show_sql", "true");
+    prop.put("hibernate.hbm2ddl.auto", "update");// validate, update, create, create-drop
     return prop;
   }
 

@@ -65,6 +65,14 @@ public class User {
     this.cars = cars;
   }
 
+  public List<Role> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(List<Role> roles) {
+    this.roles = roles;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
