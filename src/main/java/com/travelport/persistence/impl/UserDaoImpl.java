@@ -41,6 +41,10 @@ public class UserDaoImpl implements UserDao {
     return queryUsingJpql(name, carName);
   }
 
+  public boolean isUserExist(String name) {
+    return (name != null && name.equals("Naz"));
+  }
+
   private List<User> queryUsingJpql(String name, String carName) {
     // JPQL
     // select * from users where name like ?
