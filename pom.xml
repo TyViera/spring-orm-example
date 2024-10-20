@@ -18,6 +18,7 @@
     <hibernate.version>6.6.1.Final</hibernate.version>
     <mockito.version>5.14.2</mockito.version>
     <jacoco-plugin.version>0.8.12</jacoco-plugin.version>
+    <junit5.version>5.10.2</junit5.version>
   </properties>
 
   <dependencies>
@@ -93,7 +94,13 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>5.11.2</version>
+      <version>${junit5.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>${junit5.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -106,6 +113,12 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
       <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${spring-framework.version}</version>
       <scope>test</scope>
     </dependency>
 

@@ -7,7 +7,9 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
@@ -19,6 +21,12 @@ public class UserDaoImpl implements UserDao {
 
   @PersistenceContext // JPA
   private EntityManager entityManager;
+
+  private final Map<Integer, User> cache;
+
+  public UserDaoImpl() {
+    cache = new HashMap<>();
+  }
 
   /**
    * BEGIN -- 2 records INSERT INTO users (name, country) VALUES ('Jil', 'Peru'); -- 3 records
@@ -88,7 +96,8 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public Optional<User> getUserById(Integer id) {
-    return Optional.ofNullable(entityManager.find(User.class, id));
+    var foundUser = cache.computeIfAbsent(id, x -> entityManager.find(User.class, x));
+    return Optional.ofNullable(foundUser);
   }
 
   @Override
